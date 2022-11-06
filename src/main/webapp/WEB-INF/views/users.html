@@ -5,7 +5,7 @@
     <title></title>
 </head>
 <body>
-<h2>All Users</h2>
+<h2>All users</h2>
 <table>
     <tr>
         <th>Name</th>
@@ -13,18 +13,28 @@
         <th>Age</th>
         <th>Specialization</th>
         <th>Salary</th>
+        <th>Operations</th>
     </tr>
     <tr th:each="users : ${allUsers}">
-        <td th:text="${users.name}"/>
-        <td th:text="${users.surname}"/>
-        <td th:text="${users.age}"/>
-        <td th:text="${users.specialization}"/>
-        <td th:text="${users.salary}"/>
+        <td th:hidden="${users.id}"></td>
+        <td th:text="${users.name}"></td>
+        <td th:text="${users.surname}"></td>
+        <td th:text="${users.age}"></td>
+        <td th:text="${users.specialization}"></td>
+        <td th:text="${users.salary}"></td>
+        <td>
+            <form th:method="GET" th:action="@{users/{id}/edit(id=${users.getId()})}" th:object="${users}">
+                <input type="submit" th:value="Update"/>
+            </form>
+        </td>
+        <td>
+            <form th:method="DELETE" th:action="@{/users/{id}(id=${users.getId()})}" th:object="${users}">
+                <input type="submit" th:value="Delete"/>
+            </form>
+        </td>
     </tr>
-
 </table>
 <br>
-<input type="button" th:value="Add" onclick="window.location.href = 'new'"/>
-
+<input th:type="button" th:value="Add" onclick="window.location.href='users/new'"/>
 </body>
 </html>

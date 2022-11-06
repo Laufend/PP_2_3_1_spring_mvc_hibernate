@@ -8,25 +8,17 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
-import org.thymeleaf.spring5.SpringTemplateEngine;
-import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
-import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = "com.dmitriyfrolov.spring_mvc_hibernate")
 @PropertySource("classpath:db.properties")
-@EnableWebMvc
 @EnableTransactionManagement
-public class SpringConfig {
+public class HibernateConfig {
 
-    private Environment environment;
+    Environment environment;
 
     @Bean
     public DataSource dataSource() {
@@ -54,19 +46,17 @@ public class SpringConfig {
         entityManagerFactory.setDataSource(dataSource());
         entityManagerFactory.setPackagesToScan(environment.getRequiredProperty("db.entity.package"));
         entityManagerFactory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        entityManagerFactory.setJpaProperties(getHibernateProperties());
+        entityManagerFactory.setJpaProperties(hibernateProperties());
 
         return entityManagerFactory;
     }
 
-    private Properties getHibernateProperties() {
+    private Properties hibernateProperties() {
         Properties hibernateProperties = new Properties();
-        InputStream is = getClass().getClassLoader().getResourceAsStream("hibernate.properties");
-        try {
-            hibernateProperties.load(is);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        hibernateProperties.put("hibernate.dialect", environment.getRequiredProperty("org.hibernate.dialect.MySQLDialect"));
+        hibernateProperties.put("hibernate.show_sql", environment.getRequiredProperty("true"));
+        hibernateProperties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("create"));
+
         return hibernateProperties;
     }
 
@@ -74,32 +64,8 @@ public class SpringConfig {
     public PlatformTransactionManager transactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
+        transactionManager.setDataSource(dataSource());
         return transactionManager;
-    }
-
-    @Bean
-    public SpringResourceTemplateResolver templateResolver() {
-        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
-        templateResolver.setApplicationContext(applicationContext);
-        templateResolver.setPrefix("/WEB-INF/pages/");
-        templateResolver.setSuffix(".html");
-        return templateResolver;
-    }
-
-    @Bean
-    public SpringTemplateEngine templateEngine() {
-        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        templateEngine.setTemplateResolver(templateResolver());
-        templateEngine.setEnableSpringELCompiler(true);
-        return templateEngine;
-    }
-
-
-    @Override
-    public void configureViewResolvers(ViewResolverRegistry registry) {
-        ThymeleafViewResolver resolver = new ThymeleafViewResolver();
-        resolver.setTemplateEngine(templateEngine());
-        registry.viewResolver(resolver);
     }
 }
 

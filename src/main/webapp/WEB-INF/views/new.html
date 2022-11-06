@@ -1,16 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org/"
-      xmlns:form="http://www.w3.org/1999/html">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8">
     <title>addNewUser</title>
 </head>
 <body>
 <h2>User info</h2>
-<form th:method="POST" th:action="@{/}" th:object="${user}">
-    <label th:for="name">Name
+<form th:method="POST" th:action="@{/users}" th:object="${user}">
+    <label th:for="name">Name </label>
     <input type="text" th:field="*{name}" th:id="name"/>
-    </label>
     <br>
     <label th:for="surname">Surname </label>
     <input type="text" th:field="*{surname}" th:id="surname"/>
@@ -24,8 +22,7 @@
     <label th:for="salary">Salary </label>
     <input type="text" th:field="*{salary}" th:id="salary"/>
     <br>
-    <input type="submit" th:value="Ok" th:action="save"/>
+    <input type="submit" th:value="Ok"/>
 </form>
-
 </body>
 </html>
